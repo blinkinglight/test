@@ -1,0 +1,19 @@
+{
+    auto_https disable_redirects
+    log {
+        level debug
+    }
+}
+
+
+http://:8089 {
+    reverse_proxy phpmyadmin:80
+}
+
+http://meilisearch.internal {
+    reverse_proxy meilisearch:7700
+}
+
+http:// https:// {
+    reverse_proxy web:80
+}

@@ -1,0 +1,78 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  caddy:
+    image: caddy:latest
+    volumes:
+      - ./.docker/Caddyfile:/etc/caddy/Caddyfile
+    ports:
+      - "80:80"
+    links:
+      - phpmyadmin
+      - meilisearch
+    depends_on:
+        - phpmyadmin
+        - meilisearch
+        - web
+    ulimits:
+        nofile:
+            soft: 500000
+            hard: 500000
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    environment:
+      - MEILI_MASTER_KEY=masterKey
+    volumes:
+      - meilisearch-data:/data.ms
+    ulimits:
+        nofile:
+            soft: 500000
+            hard: 500000
+
+
+  redis:
+    image: redis
+    ulimits:
+        nofile:
+            soft: 500000
+            hard: 500000
+
+  db:
+    image: bitnami/mariadb:latest
+    environment:
+        - MARIADB_DATABASE=db
+        - MARIADB_ROOT_PASSWORD=password
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ulimits:
+        nofile:
+            soft: 500000
+            hard: 500000
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    links:
+      - db:mysql
+
+  web:
+    image: spiksius/dp81s:latest
+    volumes:
+      - ./:/var/www/
+    working_dir: /var/www/
+    command: >
+        /var/www/.docker/wait-for-it.sh db:3306 -- /var/www/.docker/entrypoint.sh
+    environment:
+        - DB_HOST=db
+        - OCTANE_SERVER=swoole
+    links:
+      - redis
+      - db
+      - meilisearch
+    ulimits:
+        nofile:
+            soft: 500000
+            hard: 500000
+
+volumes:
+    mariadb-data:
+    meilisearch-data:
