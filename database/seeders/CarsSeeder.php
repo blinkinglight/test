@@ -40,7 +40,7 @@ class CarsSeeder extends Seeder
 
 
         Car::factory()->count(1000)->create()->each(function ($car) use ($statuses, $users, $departaments) {
-            for ($i=0;$i<1000;$i+=3) {
+            for ($i=0;$i<100;$i+=3) {
                 $data['car_id'] = $car->id;
 
                 if (rand(1, 2) == 2) {
