@@ -8,30 +8,18 @@ services:
       - "80:80"
     links:
       - phpmyadmin
-      - meilisearch
     depends_on:
         - phpmyadmin
-        - meilisearch
         - web
     ulimits:
         nofile:
             soft: 500000
             hard: 500000
 
-  meilisearch:
-    image: getmeili/meilisearch:latest
-    environment:
-      - MEILI_MASTER_KEY=masterKey
-    volumes:
-      - meilisearch-data:/data.ms
-    ulimits:
-        nofile:
-            soft: 500000
-            hard: 500000
-
-
   redis:
-    image: redis
+    image: redis:latest
+    volumes:
+      - redis-data:/data
     ulimits:
         nofile:
             soft: 500000
@@ -67,7 +55,6 @@ services:
     links:
       - redis
       - db
-      - meilisearch
     ulimits:
         nofile:
             soft: 500000
@@ -75,4 +62,4 @@ services:
 
 volumes:
     mariadb-data:
-    meilisearch-data:
+    redis-data:

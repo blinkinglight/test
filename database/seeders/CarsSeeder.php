@@ -8,8 +8,10 @@ use App\Models\CarStatus;
 use App\Models\Departament;
 use App\Models\Status;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CarsSeeder extends Seeder
 {
@@ -18,43 +20,48 @@ class CarsSeeder extends Seeder
      *
      * @return void
      */
+
     public function run()
     {
+        $this->new();
+    }
 
+    public function new()
+    {
+        DB::statement("set global innodb_flush_log_at_trx_commit=2");
         $users = User::factory()
-            ->count(10)
+            ->count(100)
             ->for(Departament::factory()->create(), "departament")
             ->create();
 
         $statuses = Status::factory()->count(100)->create();
 
-        for($i=0; $i<100; $i++) {
-            Car::factory()->create(['car_status_id' => $statuses->random()->id]);
-        }
-        $cars = Car::all();
-
-        for($i=0; $i<100; $i++) {
-            CarStatus::factory()->create([
-                'car_id' => $cars->random()->id,
-                'status_id' => $statuses->random()->id,
-            ]);
-        }
-
         $departaments = Departament::all();
 
-        for ($i=0;$i<1000;$i++) {
 
-            $data['car_id'] = $cars->random();
-            if(rand(1,2) == 2) {
-                $data['user_id'] = $users->random()->id;
-                $data['departament_id'] = null;
-            } else {
-                $data['user_id'] = null;
-                $data['departament_id'] = $departaments->random()->id;
+        Car::factory()->count(1000)->create()->each(function ($car) use ($statuses, $users, $departaments) {
+            for ($i=0;$i<1000;$i+=3) {
+                $data['car_id'] = $car->id;
+
+                if (rand(1, 2) == 2) {
+                    $data['user_id'] = $users->random()->id;
+                    $data['departament_id'] = null;
+                } else {
+                    $data['user_id'] = null;
+                    $data['departament_id'] = $departaments->random()->id;
+                }
+
+                    $date = Carbon::now();
+                    $data["date_from"] = $date->subDays($i+3)->format("Y-m-d");
+                    $date = Carbon::now();
+                    $data["date_to"] = $date->subDays($i)->format("Y-m-d");
+
+                CarStatus::factory()->count(2)->create([
+                    'status_id' => $statuses->random()->id, 'car_id' => $car->id,
+                    'date_from' => $data["date_from"], 'date_to' => $data["date_to"]
+                ]);
+                CarManagement::factory()->create($data);
             }
-
-            CarManagement::factory()
-                ->create($data);
-        }
+        });
     }
 }

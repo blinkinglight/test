@@ -43,6 +43,6 @@ class EventServiceProvider extends ServiceProvider
     }
 
     protected $observers = [
-        CarManagement::class => CarManagementObserver::class,
+     //   CarManagement::class => CarManagementObserver::class,
     ];
 }

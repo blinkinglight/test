@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 
 class CarManagement extends Model
 {
     use HasFactory;
+
+    use HasEagerLimit;
 
     protected $table = 'car_management';
 
@@ -18,11 +22,6 @@ class CarManagement extends Model
     protected $hidden = [
         'id', 'car_id', 'user_id', 'departament_id'
     ];
-
-    public function getUserNameAttribute($value)
-    {
-        return $this->attributes['departament_id'] ? $this->departament->name : $this->user->name;
-    }
 
     public function departament()
     {

@@ -19,7 +19,7 @@ class CarManagementFactory extends Factory
     {
         $date = Carbon::now();
         return [
-            "date_from" => $date->addDays(-rand(1,20))->format("Y-m-d"),
+            "date_from" => $date->subDays(rand(1,10))->format("Y-m-d"),
             "date_to" => $date->addDays(rand(1,10))->format("Y-m-d"),
         ];
     }

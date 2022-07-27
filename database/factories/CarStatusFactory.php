@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,9 +17,10 @@ class CarStatusFactory extends Factory
      */
     public function definition()
     {
+        $date = Carbon::now();
         return [
-            "date_from" => $this->faker->date,
-            "date_to" => $this->faker->date,
+            "date_from" => $date->subDays(rand(1, 10))->format("Y-m-d"),
+            "date_to" => $date->addDays(rand(1, 10))->format("Y-m-d"),
         ];
     }
 }

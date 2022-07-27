@@ -2,4 +2,7 @@ services:
   web:
     image: spiksius/php8.1-apache
     command: ""
+  phpmyadmin:
+    ports:
+      - "8999:80"
 
